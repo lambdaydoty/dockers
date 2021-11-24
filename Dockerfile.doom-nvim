@@ -1,0 +1,16 @@
+FROM debian
+
+WORKDIR /app
+
+RUN apt update && \
+    apt install -y git gcc g++ curl && \
+    curl -LJO https://github.com/neovim/neovim/releases/download/v0.5.0/nvim.appimage && \
+    curl -LJO https://github.com/neovim/neovim/releases/download/v0.5.0/nvim.appimage.sha256sum
+
+RUN sha256sum -c nvim.appimage.sha256sum
+RUN chmod u+x ./nvim.appimage
+RUN ./nvim.appimage --appimage-extract
+
+RUN git clone --depth 1 https://github.com/NTBBloodbath/doom-nvim.git ${XDG_CONFIG_HOME:-$HOME/.config}/nvim
+
+ENTRYPOINT ['/app/squashfs-root/usr/bin/nvim']
